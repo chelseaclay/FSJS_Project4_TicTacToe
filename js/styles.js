@@ -161,6 +161,7 @@
     do {
       randomNum = Math.floor(Math.random() * 9);
       apiBlockPick = box[randomNum];
+      console.log(randomNum);
     } while (isBlockTaken(apiBlockPick) === true);
 
     if (isBlockTaken(apiBlockPick) === false) {
@@ -168,7 +169,9 @@
         // makeMove(e.target, "box-filled-2", "o");
         e.target.classList.add("box-filled-2");
       });
+      console.log(apiBlockPick);
       apiBlockPick.click();
+      movesMade++;
       currentPlayer = "o";
       highlightCurrentPlayer('player1', 'player2');
     }
@@ -239,7 +242,7 @@
     } else if (gamePlay === "single") {
       if (currentPlayer === "o") {
         makeMove(e.target, "box-filled-1", "x");
-        if (movesMade < 9) {
+        if (movesMade < 8) {
           apiMove();
         }
       }
