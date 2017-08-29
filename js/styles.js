@@ -70,9 +70,11 @@
 
     singlePlayerBtn.addEventListener("click", function () {
       gamePlay = "single";
+      gameBoard.addEventListener("click", singlePlayerMode);
     });
-    multiplayerBtn.addEventListener("click", function () {
+      multiplayerBtn.addEventListener("click", function () {
       gamePlay = "multi";
+      gameBoard.addEventListener("click", multiPlayerMode);
     });
 
     startScreenBtn.addEventListener("click", function () {
@@ -141,7 +143,7 @@
   function makeMove (targetEvt, currentPlayerFill, nextPlayer) {
     //if black is taken, alert move cannot be made
     if(isBlockTaken(targetEvt) === true){
-      console.log("Square is already taken.");
+      alert("Square is already taken.");
     //else make the players move
     } else {
       targetEvt.classList.add(currentPlayerFill);
@@ -152,28 +154,6 @@
       } else if (currentPlayer === "x") {
         highlightCurrentPlayer('player2', 'player1');
       }
-    }
-  }
-
-  function apiMove () {
-    var randomNum;
-    var apiBlockPick;
-    do {
-      randomNum = Math.floor(Math.random() * 9);
-      apiBlockPick = box[randomNum];
-      console.log(randomNum);
-    } while (isBlockTaken(apiBlockPick) === true);
-
-    if (isBlockTaken(apiBlockPick) === false) {
-      apiBlockPick.addEventListener("click", function (e) {
-        // makeMove(e.target, "box-filled-2", "o");
-        e.target.classList.add("box-filled-2");
-      });
-      console.log(apiBlockPick);
-      apiBlockPick.click();
-      movesMade++;
-      currentPlayer = "o";
-      highlightCurrentPlayer('player1', 'player2');
     }
   }
 
@@ -217,6 +197,57 @@
     }
   }
 
+  function multiPlayerMode (e) {
+    if (currentPlayer === "o") {
+      makeMove(e.target, "box-filled-1", "x");
+    } else if (currentPlayer === "x") {
+      makeMove(e.target, "box-filled-2", "o");
+    }
+    whoWon();
+  }
+
+  function singlePlayerMode (e) {
+    if (currentPlayer === "o") {
+      if(isBlockTaken(e.target) === true){
+        // console.log("Square is already taken.");
+      //else make the players move
+    } else {
+      e.target.classList.add("box-filled-1");
+      currentPlayer = "x";
+      movesMade++;
+      highlightCurrentPlayer('player2', 'player1');
+      gameBoard.removeEventListener("click", multiPlayerMode);
+      if (movesMade < 8) {
+        apiMove();
+        currentPlayer = "o";
+        highlightCurrentPlayer('player1', 'player2');
+      }
+    }
+    }
+    gameBoard.addEventListener("click", multiPlayerMode);
+    whoWon();
+  }
+
+  function apiMove () {
+    var randomNum;
+    var apiBlockPick;
+    do {
+      randomNum = Math.floor(Math.random() * 9);
+      apiBlockPick = box[randomNum];
+      console.log(randomNum);
+    } while (isBlockTaken(apiBlockPick));
+
+    function moveToMake (e) {
+      // makeMove(e.target, "box-filled-1", "x");
+      e.target.classList.add("box-filled-2");
+    }
+
+    apiBlockPick.addEventListener("click", moveToMake);
+    apiBlockPick.click();
+    movesMade++;
+    apiBlockPick.removeEventListener("click", moveToMake);
+  }
+
   //When the current player mouses over an empty square on the board, it's symbol should appear on the square
   gameBoard.addEventListener("mouseover", function(e) {
     if (currentPlayer === "o" && isBlockTaken(e.target) === false) {
@@ -229,25 +260,6 @@
   //mouseout takes the background image off
   gameBoard.addEventListener("mouseout", function(e) {
     e.target.style.backgroundImage = "";
-  });
-
-  gameBoard.addEventListener("click", function(e) {
-    if (gamePlay === "multi") {
-      if (currentPlayer === "o") {
-        makeMove(e.target, "box-filled-1", "x");
-      } else if (currentPlayer === "x") {
-        makeMove(e.target, "box-filled-2", "o");
-      }
-      whoWon();
-    } else if (gamePlay === "single") {
-      if (currentPlayer === "o") {
-        makeMove(e.target, "box-filled-1", "x");
-        if (movesMade < 8) {
-          apiMove();
-        }
-      }
-      whoWon();
-    }
   });
 
   $(document).ready(function () {
