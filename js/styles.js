@@ -1,4 +1,4 @@
-// !(function () {
+!(function () {
   const startScreenDiv = document.createElement("div");
     startScreenDiv.setAttribute("class", "screen screen-start");
     startScreenDiv.setAttribute("id", "start");
@@ -68,20 +68,24 @@
     startScreenDiv.appendChild(startScreenHeader);
     document.querySelector("body").appendChild(startScreenDiv);
 
+    //if players chooses single player mode, run that singlePlayerMode function
     singlePlayerBtn.addEventListener("click", function () {
       gamePlay = "single";
       gameBoard.addEventListener("click", singlePlayerMode);
     });
+    //if players chooses single player mode, run that singlePlayerMode function
       multiplayerBtn.addEventListener("click", function () {
       gamePlay = "multi";
       gameBoard.addEventListener("click", multiPlayerMode);
     });
 
+    //once single player or multiplayer have been selected, get the values of the input to display above the game board and remove the start screen
     startScreenBtn.addEventListener("click", function () {
       var player1Name = "<p class='player-name'>" + player1.value + "</p>";
       var player2Name = "<p class='player-name'>" + player2.value + "</p>";
       $(player1Name).insertBefore("#player1 svg");
       $(player2Name).insertBefore("#player2 svg");
+      $(".player-name").css("color", "black");
       $("#start").remove();
     });
   }
@@ -116,6 +120,7 @@
     });
   }
 
+  //reset the board after a win or tie
   function boardReset (removeScreen) {
     $(".box-filled-1").removeClass("box-filled-1");
     $(".box-filled-2").removeClass("box-filled-2");
@@ -157,6 +162,7 @@
     }
   }
 
+  // test to check for a winner
   function forTheWin (currentPlayerFill, currentPlayer) {
     if (box[0].classList.contains(currentPlayerFill) &&
         box[1].classList.contains(currentPlayerFill) &&
@@ -209,21 +215,22 @@
   function singlePlayerMode (e) {
     if (currentPlayer === "o") {
       if(isBlockTaken(e.target) === true){
-        // console.log("Square is already taken.");
-      //else make the players move
-    } else {
-      e.target.classList.add("box-filled-1");
-      currentPlayer = "x";
-      movesMade++;
-      highlightCurrentPlayer('player2', 'player1');
-      gameBoard.removeEventListener("click", multiPlayerMode);
-      if (movesMade < 8) {
-        apiMove();
-        currentPlayer = "o";
-        highlightCurrentPlayer('player1', 'player2');
+      } else {
+        e.target.classList.add("box-filled-1");
+        currentPlayer = "x";
+        movesMade++;
+        highlightCurrentPlayer('player2', 'player1');
+        //remove click from gameBoard so the API doesn't cause a double click and play twice
+        gameBoard.removeEventListener("click", multiPlayerMode);
+        //only let the API make a move if the board is not full
+        if (movesMade < 8) {
+          apiMove();
+          currentPlayer = "o";
+          highlightCurrentPlayer('player1', 'player2');
+        }
       }
     }
-    }
+    //add the listener back to the gameBoard for "o"
     gameBoard.addEventListener("click", multiPlayerMode);
     whoWon();
   }
@@ -234,17 +241,16 @@
     do {
       randomNum = Math.floor(Math.random() * 9);
       apiBlockPick = box[randomNum];
-      console.log(randomNum);
     } while (isBlockTaken(apiBlockPick));
 
     function moveToMake (e) {
-      // makeMove(e.target, "box-filled-1", "x");
       e.target.classList.add("box-filled-2");
     }
 
     apiBlockPick.addEventListener("click", moveToMake);
     apiBlockPick.click();
     movesMade++;
+    //remove click from apiBlockPick so the API doesn't cause a double click and play twice
     apiBlockPick.removeEventListener("click", moveToMake);
   }
 
@@ -266,10 +272,12 @@
     showStartScreen();
     highlightCurrentPlayer('player1', 'player2');
 
+    //after single player or multiPlayer have been selected, place the correct imputs fields on the page with the start game button
     document.getElementById("singlePlayer").addEventListener("click", function () {
       $("#multiPlayer").hide();
       $("#singlePlayer").hide();
       startScreenHeader.appendChild(player1);
+      player2.value = "Computer";
       startScreenHeader.appendChild(startScreenBtn);
     });
 
@@ -281,4 +289,4 @@
       startScreenHeader.appendChild(startScreenBtn);
     });
   });
-// })();
+})();
